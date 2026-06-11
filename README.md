@@ -174,3 +174,43 @@ Di terminal lain:
 ```bash
 npm run dev
 ```
+
+## 12. Jawaban Soal Tambahan (Keamanan Website)
+
+Untuk mengamankan aplikasi web kompetisi/ujian ini dari potensi serangan siber, berikut adalah metode paling efektif yang diterapkan dengan memanfaatkan fitur bawaan Laravel dan konfigurasi server.
+
+### Pencegahan Cross-Site Request Forgery (CSRF)
+
+Metode: Setiap request berbasis POST, PUT, atau DELETE wajib menggunakan `@csrf` token di Laravel.
+
+Fungsi: Memastikan bahwa setiap aksi penyerahan jawaban atau modifikasi data benar-benar berasal dari user yang sah di browser tersebut, bukan dari manipulasi situs pihak ketiga.
+
+### Pencegahan SQL Injection Melalui Eloquent ORM dan Query Builder
+
+Metode: Proses input dan manipulasi database sepenuhnya menggunakan Eloquent ORM atau prepared statements. Hindari penggunaan query mentah (`DB::raw`) yang langsung menggabungkan variabel input tanpa sanitasi.
+
+Fungsi: Memastikan semua input user disanitasi secara otomatis sebelum dieksekusi oleh database.
+
+### Pencegahan Cross-Site Scripting (XSS) pada Soal dan Jawaban
+
+Metode: Menggunakan sintaks double curly braces `{{ $variable }}` bawaan Blade engine saat menampilkan soal atau review jawaban.
+
+Fungsi: Laravel secara otomatis mengubah karakter berbahaya seperti `<script>` menjadi entitas HTML aman (`&lt;script&gt;`), sehingga mencegah penyisipan kode JavaScript berbahaya ke dalam soal atau sistem ujian.
+
+### Autentikasi dan Otorisasi Ketat (Middleware)
+
+Metode: Memisahkan hak akses Admin dan User menggunakan Laravel Middleware, misalnya `auth` dan middleware kustom seperti `isAdmin`.
+
+Fungsi: Memastikan User biasa tidak bisa mengakses endpoint Admin, seperti membuat ujian atau menambah waktu, meskipun mereka menebak atau mengganti URL secara manual.
+
+### Pengamanan Integritas Data Jawaban (Anti-Cheat / Autosave Tampering)
+
+Metode: Proses autosave menggunakan API berbasis token (Sanctum/Session) yang memvalidasi payload di sisi server. Waktu ujian (countdown) dikontrol langsung dari timestamp di database server, bukan hanya mengandalkan JavaScript di browser user.
+
+Fungsi: Mencegah user memanipulasi sisa waktu atau mengubah jawaban milik user lain melalui Developer Tools di browser.
+
+### Deployment dan Environment Security
+
+Metode: Memastikan `APP_DEBUG=false` di file `.env` saat aplikasi di-deploy, serta menyembunyikan file sensitif.
+
+Fungsi: Mencegah bocornya informasi struktur database atau error log yang bisa dimanfaatkan peretas untuk mencari celah keamanan.
